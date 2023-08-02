@@ -2,20 +2,25 @@
   "name": "overcome-coding-test-shy",
   "version": "1.0.0",
   "description": "만성 코테 울렁증 환자의 '코테 울렁증 극복기'",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "crawl": "ts-node index"
+    "build": "npx tsc",
+    "dev" : "npx tsc --watch"
   },
   "bin": {
-    "crawl" : "./crawl.js"
+    "chatter": "./dist/chatter.js",
+    "ct" : "./dist/chatter.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.4.0",
+    "commander": "^11.0.0",
+    "figlet": "^1.6.0",
     "puppeteer": "^20.9.0"
   },
   "devDependencies": {
+    "@types/figlet": "^1.5.6",
     "@types/node": "^20.4.5",
     "eslint": "^8.46.0",
     "prettier": "^3.0.0",
