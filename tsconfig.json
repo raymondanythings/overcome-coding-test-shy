@@ -13,6 +13,5 @@
     "esModuleInterop":true,
     "outDir": "dist",
     "rootDir": "package"
-  },
-  "exclude": ["node_modules"]
+  }
 }

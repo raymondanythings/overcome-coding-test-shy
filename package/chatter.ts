@@ -2,51 +2,52 @@
 import { writeFileSync } from "fs";
 import puppeteer from "puppeteer";
 import * as figlet from 'figlet'
-import { Command } from "commander";
 import packageJson from '../package.json'
 import { CLI } from "./CLI";
-const CommandArgs = ['ls' , 'v']  as const
-
-type processArgs = {
-    [P in typeof CommandArgs[number]]?:boolean
-}
+import * as pt from 'path'
 
 
-async function getDescriptionFromProgrammers() {
+async function getDescriptionFromProgrammers({url,path} : {url : string; path:string}) {
+    // algorithm-title
     const browser = await puppeteer.launch({
         headless:'new'
     })
     const page = await browser.newPage()
-    await page.goto('https://school.programmers.co.kr/learn/courses/30/lessons/42883')
+    await page.goto(url)
     await new Promise(resolve => setTimeout(resolve, 2000))
+
+    const title = (await page.$eval('.algorithm-title',(el) => el.textContent)).trim()
 
     const testDescriptions = await page.evaluate(() => {
         const elements = [...document.querySelectorAll('div.main-section > .guide-section > div.guide-section-description > div.markdown > *')]
         return elements.map(el => el.outerHTML)
-        
     })
-    writeFileSync('issue.txt','<h5>문제설명</h5>\n' + testDescriptions.join('\n'))
-
+    if(!testDescriptions.length){
+        throw new Error('문제를 찾지 못했어요. 문제번호를 확인해주세요.')
+    }
+    const urlList = url.split('/')
+    const location = pt.join(path,`${title ?? urlList[urlList.length-1]}.md`)
+    console.log(`저장중....\n 경로 : ${location}`)
+    writeFileSync(location, `<h1>${title}</h1>\n` +'<h5>문제설명</h5>\n' + testDescriptions.join('\n'))
     await browser.close()
+    console.log("DONE!")
 }
 
 
-// getDescriptionFromProgrammers()
+
+
 const program = new CLI();
-// console.log(figlet.textSync('TESTING CRAWLER'))
 
 program
-  .description("An example CLI for managing a directory")
-  .version(packageJson.version)
-  .option("-l | --ls  [value]", "List directory contents")
-  .option("-m | --mkdir <value>", "Create a directory")
-  .option("-t | --touch <value>", "Create a file")
-  .option('-v | --version', 'show current version')
-  .parse(process.argv);
+    .description("코딩테스트 문제설명 크롤러 'Chatter'")
+    .version(packageJson.version,'-v | --version',"현재 버전 표시")
+    .option('-n | --number <value> required', '문제번호 (필수)')
+    .option("-p | --path  <value>", "설명글을 저장할 위치",'./')
+    .option("-t | --target <value>", "크롤링 위치 programmers | baekjoon",'programmers')
+    .option('-h | --help', '명령어 도움말 출력')
+    .parse(process.argv);
+program.execution(({path,target,url}) => getDescriptionFromProgrammers({url,path}))
+console.log(figlet.textSync('Chatter'))
 
-
-const options = program.opts() as processArgs
-const commandArray = process.argv.slice(2)
-console.log(commandArray,'<<')
 
 
