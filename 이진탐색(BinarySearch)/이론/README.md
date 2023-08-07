@@ -6,6 +6,8 @@
     - [코드 예시](#코드-예시)
   - [특정 원소의 개수 구하기](#특정-원소의-개수-구하기)
     - [코드 예시](#코드-예시-1)
+  - [파라메트릭 서치](#파라메트릭-서치)
+    - [코드예시](#코드예시)
 ---
 ## 순차탐색 vs 이진탐색
 - 순차탐색
@@ -129,3 +131,40 @@ function countByRange(arr, left, right) {
 ```
 <!-- TODO -->
 <!-- ## 파라메트릭 서치 이해하기 -->
+---
+## 파라메트릭 서치
+최적화 문제를 `결정문제('예' or '아니오')`로 바꾸어 해결하는 기법
+  - ex) 특정 조건을 만족하는 가장 알맞은 값을 빠르게 찾는 `최적화` 문제
+일반적으로 파라메트릭 서치 문제는 `이진 탐색`을 이용하여 해결 가능
+
+
+### 코드예시
+- 백준 : 예산
+- https://www.acmicpc.net/problem/2512
+[문제설명-바로가기](../%EB%B0%B1%EC%A4%80/silver2/%EC%98%88%EC%82%B0/%EC%98%88%EC%82%B0.md)
+```javascript
+const input = `5
+70 80 30 40 100
+450`.split("\n");
+
+const N = +input[0];
+const arr = input[1].split(" ").map(Number);
+const M = +input[2];
+
+let left = 0;
+let right = arr.reduce((ac, cu) => Math.max(ac, cu), 0);
+let answer = 0;
+while (left <= right) {
+  const mid = ((left + right) / 2) >> 0;
+  const totalPrice = arr.reduce((ac, cu) => ac + Math.min(cu, mid), 0);
+  if (totalPrice <= M) {
+    left = mid + 1;
+    answer = mid;
+  } else {
+    right = mid - 1;
+  }
+}
+
+console.log(answer);
+
+```
